@@ -29,7 +29,7 @@ namespace WiseUtility.ScrollViewPooling
                 return;
             }
 
-            float itemPos = Mathf.Abs(itemPositionCache[previousScrollIndex]) + itemHeightCache;
+            float itemPos = Mathf.Abs(itemPositionCache[previousScrollIndex]) + itemHeightCache * 3;
             int curIndex = topPos > itemPos ? previousScrollIndex + 1 : previousScrollIndex - 1;
             int border = (int)(itemPositionCache[0] + itemHeightCache);
             int step = (int)((topPos + (topPos / 1.25f)) / border);
@@ -83,7 +83,9 @@ namespace WiseUtility.ScrollViewPooling
                     curIndex = previousScrollIndex - 1;
                 }
 
-                int newIndex = curIndex % itemObjectCache.Length;
+                int itemLength = itemObjectCache.Length;
+                int newIndex = curIndex % itemLength;
+
                 Vector2 pos = itemRectCache[newIndex].anchoredPosition;
                 pos.y = itemPositionCache[curIndex];
                 itemRectCache[newIndex].anchoredPosition = pos;

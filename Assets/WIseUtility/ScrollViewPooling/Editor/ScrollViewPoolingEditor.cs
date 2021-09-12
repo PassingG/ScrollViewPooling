@@ -12,6 +12,8 @@ namespace WiseUtility.ScrollViewPooling
         private SerializedObject _object;
 
         private SerializedProperty _prefab;
+
+        private SerializedProperty _poolingCount;
         private SerializedProperty _topPadding;
         private SerializedProperty _bottomPadding;
         private SerializedProperty _itemSpace;
@@ -43,6 +45,7 @@ namespace WiseUtility.ScrollViewPooling
             _target = (ScrollViewPooling) target;
             _object = new SerializedObject(target);
             _prefab = _object.FindProperty("Prefab");
+            _poolingCount = _object.FindProperty("PoolingCount");
             _topPadding = _object.FindProperty("TopPadding");
             _bottomPadding = _object.FindProperty("BottomPadding");
             _itemSpace = _object.FindProperty("ItemSpace");
@@ -68,6 +71,7 @@ namespace WiseUtility.ScrollViewPooling
             {
                 case EScrollType.Vertical:
                     EditorGUILayout.PropertyField(_prefab);
+                    EditorGUILayout.PropertyField(_poolingCount);
                     EditorGUILayout.PropertyField(_topPadding);
                     EditorGUILayout.PropertyField(_bottomPadding);
                     EditorGUILayout.PropertyField(_itemSpace);
@@ -78,6 +82,7 @@ namespace WiseUtility.ScrollViewPooling
                     break;
                 case EScrollType.Horizontal:
                     EditorGUILayout.PropertyField(_prefab);
+                    EditorGUILayout.PropertyField(_poolingCount);
                     EditorGUILayout.PropertyField(_leftPadding);
                     EditorGUILayout.PropertyField(_rightPadding);
                     EditorGUILayout.PropertyField(_itemSpace);

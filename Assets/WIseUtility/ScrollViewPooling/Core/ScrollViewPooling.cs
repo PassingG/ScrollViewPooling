@@ -26,7 +26,7 @@ namespace WiseUtility.ScrollViewPooling
 
         // Vertical Option
         [Header("How many item will pooling"), Space(10)]
-        public int PoolingCount = 2;
+        public int PoolingCount = 3;
 
         [Header("Paddings"),Space(10)]
         public int TopPadding = 10;

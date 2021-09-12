@@ -694,7 +694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pooling: {fileID: 1839581906}
-  itemCount: 100
+  itemCount: 200
   width: 200
   images:
   - {fileID: 21300000, guid: 6f252bb059cd2844eb3b76f857cfc631, type: 3}
@@ -827,7 +827,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prefab: {fileID: 8989511748477962818, guid: 45695eb522d987f479ace93e0b46c4f9, type: 3}
   updateIconPrefab: {fileID: 5230566019083322028, guid: 50d62cc5d4c9d1941aa577dcde8039ab, type: 3}
-  PoolingCount: 2
+  PoolingCount: 3
   TopPadding: 10
   BottomPadding: 10
   LeftPadding: 10
@@ -840,7 +840,7 @@ MonoBehaviour:
   PullingComment: 
   PullOffset: 1.5
   UpdateIconOffest: 85
-  ScrollType: 1
+  ScrollType: 0
 --- !u!1 &1900281644
 GameObject:
   m_ObjectHideFlags: 0
