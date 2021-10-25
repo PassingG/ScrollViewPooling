@@ -2,17 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class Item : MonoBehaviour
 {
-    [SerializeField] private Text itemIndex;
-    [SerializeField] private Image itemIcon;
+    [SerializeField] private TextMeshProUGUI itemIndex;
+    [SerializeField] private TextMeshProUGUI dataText;
 
-    [SerializeField] private Sprite[] items;
-
-    public void SetView(int index, int itemGrade)
+    public void SetView(int index, int data)
     {
-        itemIndex.text = itemIndex.ToString();  
-        itemIcon.sprite = items[itemGrade];
+        itemIndex.text = index.ToString();
+        dataText.text = $"Data:{data.ToString()}";
     }
 }
