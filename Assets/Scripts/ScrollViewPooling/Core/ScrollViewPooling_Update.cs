@@ -2,12 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace WiseUtility.ScrollViewPooling
+namespace Utility.ScrollViewPooling
 {
     // Update
     public partial class ScrollViewPooling
@@ -18,31 +17,26 @@ namespace WiseUtility.ScrollViewPooling
             {
                 return;
             }
-
-            float topPos = content.anchoredPosition.y - ItemSpace;
-            if(topPos < 0f)
+            if(scrollRect.velocity.y == 0f)
             {
                 return;
             }
+
+            float topPos = content.anchoredPosition.y - ItemSpace;
+
             if(!itemPositionCache.ContainsKey(previousScrollIndex))
             {
                 return;
             }
 
-            float itemPos = Mathf.Abs(itemPositionCache[previousScrollIndex]) + itemHeightCache * 3;
-            int curIndex = topPos > itemPos ? previousScrollIndex + 1 : previousScrollIndex - 1;
-            int border = (int)(itemPositionCache[0] + itemHeightCache);
-            int step = (int)((topPos + (topPos / 1.25f)) / border);
-            if(step != saveStepPosition)
-            {
-                saveStepPosition = step;
-            }
-            else
-            {
-                return;
-            }
+            scrollRect.velocity = new Vector2(scrollRect.velocity.x,Mathf.Clamp(scrollRect.velocity.y, -SCROLL_SPEED, SCROLL_SPEED));
 
-            if(curIndex < 0 || previousScrollIndex == curIndex || scrollRect.velocity.y == 0f)
+            float perItemSize = itemHeightCache + ItemSpace;
+            float calculateCurPos = topPos - (perItemSize * (float)(PoolingCount-1));
+            calculateCurPos = Mathf.Max(calculateCurPos, 0f);
+            int curIndex = (int)(calculateCurPos / perItemSize);
+
+            if(previousScrollIndex == curIndex)
             {
                 return;
             }
@@ -53,7 +47,7 @@ namespace WiseUtility.ScrollViewPooling
                     curIndex = previousScrollIndex + 1;
                 }
                 
-                int itemLength = itemObjectCache.Length;
+                int itemLength = itemObjectCache[curPrefabIndex].Count;
                 int newIndex = curIndex % itemLength;
                 newIndex--;
 
@@ -63,7 +57,7 @@ namespace WiseUtility.ScrollViewPooling
                 }
 
                 int index = curIndex + itemLength - 1;
-                if (index < itemCountCache)
+                if (index < itemCountCache && index >= 0)
                 {
                     Vector2 pos = itemRectCache[newIndex].anchoredPosition;
                     pos.y = itemPositionCache[index];
@@ -73,7 +67,14 @@ namespace WiseUtility.ScrollViewPooling
                     size.y = itemHeightCache;
                     itemRectCache[newIndex].sizeDelta = size;
 
-                    OnUpdateItem(index, newIndex);
+                    if (isReverse)
+                    {
+                        OnUpdateItem(itemCountCache - index - 1, newIndex);
+                    }
+                    else
+                    {
+                        OnUpdateItem(index, newIndex);
+                    }
                 }
             }
             else
@@ -83,7 +84,7 @@ namespace WiseUtility.ScrollViewPooling
                     curIndex = previousScrollIndex - 1;
                 }
 
-                int itemLength = itemObjectCache.Length;
+                int itemLength = itemObjectCache[curPrefabIndex].Count;
                 int newIndex = curIndex % itemLength;
 
                 Vector2 pos = itemRectCache[newIndex].anchoredPosition;
@@ -95,7 +96,14 @@ namespace WiseUtility.ScrollViewPooling
 
                 itemRectCache[newIndex].sizeDelta = size;
 
-                OnUpdateItem(curIndex, newIndex);
+                if (isReverse)
+                {
+                    OnUpdateItem(itemCountCache - curIndex - 1, newIndex);
+                }
+                else
+                {
+                    OnUpdateItem(curIndex, newIndex);
+                }
             }
             previousScrollIndex = curIndex;
         }
@@ -105,31 +113,26 @@ namespace WiseUtility.ScrollViewPooling
             {
                 return;
             }
-
-            float leftPos = -content.anchoredPosition.x - ItemSpace;
-            if (leftPos < 0f)
+            if(scrollRect.velocity.x == 0f)
             {
                 return;
             }
+
+            float leftPos = -content.anchoredPosition.x - LeftPadding;
+
             if (!itemPositionCache.ContainsKey(previousScrollIndex))
             {
                 return;
             }
 
-            float itemPos = Mathf.Abs(itemPositionCache[previousScrollIndex]) + itemWidthCache;
-            int curIndex = leftPos > itemPos ? previousScrollIndex + 1 : previousScrollIndex - 1;
-            int border = (int)(itemPositionCache[0] + itemWidthCache);
-            int step = (int)((leftPos + (leftPos / 1.25f)) / border);
-            if (step != saveStepPosition)
-            {
-                saveStepPosition = step;
-            }
-            else
-            {
-                return;
-            }
+            scrollRect.velocity = new Vector2(Mathf.Clamp(scrollRect.velocity.x, -SCROLL_SPEED, SCROLL_SPEED),scrollRect.velocity.y);
 
-            if (curIndex < 0 || previousScrollIndex == curIndex || scrollRect.velocity.x == 0f)
+            float perItemSize = itemWidthCache + ItemSpace;
+            float calculateCurPos = leftPos - (perItemSize * (float)(PoolingCount-1));
+            calculateCurPos = Mathf.Max(calculateCurPos, 0f);
+            int curIndex = (int)(calculateCurPos / perItemSize);
+
+            if (previousScrollIndex == curIndex)
             {
                 return;
             }
@@ -140,7 +143,7 @@ namespace WiseUtility.ScrollViewPooling
                     curIndex = previousScrollIndex + 1;
                 }
 
-                int itemLength = itemObjectCache.Length;
+                int itemLength = itemObjectCache[curPrefabIndex].Count;
                 int newIndex = curIndex % itemLength;
                 newIndex--;
 
@@ -157,10 +160,17 @@ namespace WiseUtility.ScrollViewPooling
                     itemRectCache[newIndex].anchoredPosition = pos;
 
                     Vector2 size = itemRectCache[newIndex].sizeDelta;
-                    size.x = itemHeightCache;
+                    size.x = itemWidthCache;
                     itemRectCache[newIndex].sizeDelta = size;
 
-                    OnUpdateItem(index, newIndex);
+                    if (isReverse)
+                    {
+                        OnUpdateItem(itemCountCache - index - 1, newIndex);
+                    }
+                    else
+                    {
+                        OnUpdateItem(index, newIndex);
+                    }
                 }
             }
             else
@@ -170,17 +180,26 @@ namespace WiseUtility.ScrollViewPooling
                     curIndex = previousScrollIndex - 1;
                 }
 
-                int newIndex = curIndex % itemObjectCache.Length;
+                int itemLength = itemObjectCache[curPrefabIndex].Count;
+                int newIndex = curIndex % itemLength;
+
                 Vector2 pos = itemRectCache[newIndex].anchoredPosition;
-                pos.y = itemPositionCache[curIndex];
+                pos.x = itemPositionCache[curIndex];
                 itemRectCache[newIndex].anchoredPosition = pos;
 
                 Vector2 size = itemRectCache[newIndex].sizeDelta;
-                size.y = itemHeightCache;
+                size.x = itemWidthCache;
 
                 itemRectCache[newIndex].sizeDelta = size;
 
-                OnUpdateItem(curIndex, newIndex);
+                if (isReverse)
+                {
+                    OnUpdateItem(itemCountCache - curIndex - 1, newIndex);
+                }
+                else
+                {
+                    OnUpdateItem(curIndex, newIndex);
+                }
             }
             previousScrollIndex = curIndex;
         }

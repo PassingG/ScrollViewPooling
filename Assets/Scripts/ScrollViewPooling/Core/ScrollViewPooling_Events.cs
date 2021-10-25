@@ -2,12 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace WiseUtility.ScrollViewPooling
+namespace Utility.ScrollViewPooling
 {
     // Events
     public partial class ScrollViewPooling
@@ -17,7 +16,6 @@ namespace WiseUtility.ScrollViewPooling
             switch (ScrollType)
             {
                 case EScrollType.Vertical:
-                    ScrollChangeVertical(vector);
                     break;
                 case EScrollType.Horizontal:
                     break;

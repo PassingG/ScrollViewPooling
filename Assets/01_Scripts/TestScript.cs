@@ -1,15 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using WiseUtility.ScrollViewPooling;
+using Utility.ScrollViewPooling;
 
+public enum TestEnum
+{
+    Normal,
+    Good,
+    Best,
+}
 public class TestScript : MonoBehaviour
 {
     public static TestScript Instance;
 
     [SerializeField] ScrollViewPooling pooling;
     
-    [Range(1,200)]
+    [Range(1,1000)]
     public int itemCount = 100;
 
     public float width = 200f;
@@ -29,16 +36,20 @@ public class TestScript : MonoBehaviour
     }
     private void Start()
     {
-        RandomDatas(itemCount);
+        InitScrollviewPooling();
+    }
+
+    public void InitScrollviewPooling()
+    {
+        int EnumLength = Enum.GetValues(typeof(TestEnum)).Length;
+
+        for (int i = 0; i < Enum.GetValues(typeof(TestEnum)).Length; i++)
+        {
+            pooling.Initialize(itemCount, i);
+
+        }
 
         pooling.OnUpdateItem += UpdateItem;
-        GameObject[] objectTmp = pooling.Initialize(itemCount, width);
-
-        for (int i = 0; i < objectTmp.Length; i++)
-        {
-            items.Add(objectTmp[i].GetComponent<Item>());
-        }
-        pooling.InitView();
     }
 
     private void UpdateItem(int dataIndex, int objectIndex)
@@ -47,21 +58,6 @@ public class TestScript : MonoBehaviour
         for (int i = 0; i < datas.GetLength(1); i++)
         {
             dataTmp[i] = datas[dataIndex,i];
-        }
-
-        items[objectIndex].SetView(dataTmp);
-    }
-    
-    private void RandomDatas(int itemCount)
-    {
-        datas = new int[itemCount,images.Length];
-
-        for (int i = 0; i < itemCount; i++)
-        {
-            for (int j = 0; j < images.Length; j++)
-            {
-                datas[i,j] = Random.Range(0,images.Length);
-            }
         }
     }
 }

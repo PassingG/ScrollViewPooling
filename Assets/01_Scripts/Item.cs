@@ -5,13 +5,14 @@ using UnityEngine.UI;
 
 public class Item : MonoBehaviour
 {
-    public Image[] items;
+    [SerializeField] private Text itemIndex;
+    [SerializeField] private Image itemIcon;
 
-    public void SetView(int[] index)
+    [SerializeField] private Sprite[] items;
+
+    public void SetView(int index, int itemGrade)
     {
-        for (int i = 0; i < items.Length; i++)
-        {
-            items[i].sprite = TestScript.Instance.images[index[i]];
-        }
+        itemIndex.text = itemIndex.ToString();  
+        itemIcon.sprite = items[itemGrade];
     }
 }

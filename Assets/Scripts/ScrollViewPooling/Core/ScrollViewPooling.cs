@@ -2,24 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace WiseUtility.ScrollViewPooling
+namespace Utility.ScrollViewPooling
 {
     // Main
     [RequireComponent(typeof(ScrollRect))]
     public partial class ScrollViewPooling : MonoBehaviour
     {
         #region ----- [ Settings ] -----
-        private const float SCROLL_DURATION = 0.25f;
-        private const int MIN_UPDATE_TIME = 500;
-        private const float SCROLL_SPEED = 50f;
+        private const float SCROLL_SPEED = 5000f;
 
-        [Header("Item Prefab"), Space(10)]
-        public GameObject Prefab;
+        public bool isReverse = false;
+
+        [Space(10)]
+        public GameObject[] Prefabs;
 
         [Header("UpdateIcon Prefab"), Space(10)]
         public GameObject updateIconPrefab;
@@ -66,9 +65,13 @@ namespace WiseUtility.ScrollViewPooling
         private Rect container;
 
         private RectTransform[] itemRectCache;
-        private GameObject[] itemObjectCache;
+        private List<List<GameObject>> itemObjectCache;
+        public GameObject[] GetGameObjects(int prefabIndex) => itemObjectCache[prefabIndex].ToArray();
 
         private Dictionary<int, float> itemPositionCache;
+
+        private int curPrefabIndex = 0;
+
         private int itemCountCache;
         private float itemHeightCache;
         private float itemWidthCache;
@@ -102,37 +105,60 @@ namespace WiseUtility.ScrollViewPooling
         {
             container = GetComponent<RectTransform>().rect;
             scrollRect = GetComponent<ScrollRect>();
-            content = scrollRect.viewport.transform.GetChild(0).GetComponent<RectTransform>();
+            content = scrollRect.content;
             itemPositionCache = new Dictionary<int, float>();
-            scrollRect.onValueChanged.AddListener(OnScrollChange);
-            CreateIcons();
+
+            itemObjectCache = new List<List<GameObject>>();
+            for(int i=0;i<Prefabs.Length;i++)
+            {
+                itemObjectCache.Add(new List<GameObject>());
+            }
+            // scrollRect.onValueChanged.AddListener(OnScrollChange);
+            // CreateIcons();
         }
 
-        public GameObject[] Initialize(int itemCount, float size)
+        public bool Initialize(int itemCount, int curPrefabIndex)
         {
+            for (int i = 0; i < itemObjectCache?[this.curPrefabIndex]?.Count; i++)
+            {
+                itemObjectCache[this.curPrefabIndex][i].SetActive(false);
+            }
+            this.curPrefabIndex = curPrefabIndex;
             itemCountCache = itemCount;
 
             switch (ScrollType)
             {
                 case EScrollType.Vertical:
-                    InitVertical(size);
-                    break;
+                    return InitVertical();
                 case EScrollType.Horizontal:
-                    InitHorizontal(size);
-                    break;
+                    return InitHorizontal();
             }
-
-            return itemObjectCache;
+            return false;
         }
         public void InitView()
         {
-            for (int i = 0; i < itemObjectCache.Length; i++)
+            bool showed = false;
+
+            for (int i = 0; i < itemObjectCache[curPrefabIndex].Count; i++)
             {
-                OnUpdateItem(i,i);
+                showed = i < itemCountCache;
+                itemObjectCache[curPrefabIndex][i].SetActive(showed);
+                if (i + 1 > itemCountCache)
+                {
+                    continue;
+                }
+
+                if(isReverse)
+                {
+                    OnUpdateItem(itemCountCache - i - 1, i);
+                }
+                else
+                {
+                    OnUpdateItem(i, i);
+                }
             }
+
         }
-        partial void InitVertical(float height);
-        partial void InitHorizontal(float width);
 
 
         private void Update()

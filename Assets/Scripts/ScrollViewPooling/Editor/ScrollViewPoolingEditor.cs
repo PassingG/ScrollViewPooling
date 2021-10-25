@@ -1,17 +1,21 @@
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
-namespace WiseUtility.ScrollViewPooling
+namespace Utility.ScrollViewPooling
 {
     [CustomEditor(typeof(ScrollViewPooling))]
     public class ScrollViewPoolingEditor : Editor
     {
+        private ReorderableList list;
+        
         private ScrollViewPooling _target;
-
 
         private SerializedObject _object;
 
-        private SerializedProperty _prefab;
+        private SerializedProperty _prefabs;
+
+        private SerializedProperty _isReverse;
 
         private SerializedProperty _poolingCount;
         private SerializedProperty _topPadding;
@@ -42,9 +46,25 @@ namespace WiseUtility.ScrollViewPooling
         /// </summary>
         private void OnEnable()
         {
-            _target = (ScrollViewPooling) target;
             _object = new SerializedObject(target);
-            _prefab = _object.FindProperty("Prefab");
+
+            list = new ReorderableList(_object, _object.FindProperty("Prefabs"), true, true, true, true);
+        // Element 가 그려질 때 Callback 
+        list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) => 
+        { 
+            // 현재 그려질 요소 
+            SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index); 
+            rect.y += 2; 
+            // 위쪽 패딩 
+            EditorGUI.PropertyField( new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), 
+            element.FindPropertyRelative("eTriggerType"), GUIContent.none); 
+            EditorGUI.PropertyField( new Rect(rect.x + 100, rect.y, rect.width - 100 - 30, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("ConditoinList"), GUIContent.none); 
+        };
+
+
+            _target = (ScrollViewPooling) target;
+            _isReverse = _object.FindProperty("isReverse");
+            _prefabs = _object.FindProperty("Prefabs");
             _poolingCount = _object.FindProperty("PoolingCount");
             _topPadding = _object.FindProperty("TopPadding");
             _bottomPadding = _object.FindProperty("BottomPadding");
@@ -70,7 +90,8 @@ namespace WiseUtility.ScrollViewPooling
             switch (_target.ScrollType)
             {
                 case EScrollType.Vertical:
-                    EditorGUILayout.PropertyField(_prefab);
+                    EditorGUILayout.PropertyField(_isReverse);
+                    EditorGUILayout.PropertyField(_prefabs);
                     EditorGUILayout.PropertyField(_poolingCount);
                     EditorGUILayout.PropertyField(_topPadding);
                     EditorGUILayout.PropertyField(_bottomPadding);
@@ -81,7 +102,8 @@ namespace WiseUtility.ScrollViewPooling
                     EditorGUILayout.PropertyField(_updateIconOffest);
                     break;
                 case EScrollType.Horizontal:
-                    EditorGUILayout.PropertyField(_prefab);
+                    EditorGUILayout.PropertyField(_isReverse);
+                    EditorGUILayout.PropertyField(_prefabs);
                     EditorGUILayout.PropertyField(_poolingCount);
                     EditorGUILayout.PropertyField(_leftPadding);
                     EditorGUILayout.PropertyField(_rightPadding);
