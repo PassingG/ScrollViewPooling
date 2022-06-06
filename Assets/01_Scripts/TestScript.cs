@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Utility.ScrollViewPooling;
+using Wise.ScrollViewPooling;
 
 public enum TestEnum
 {
@@ -18,8 +18,9 @@ public class TestScript : MonoBehaviour
 
     [SerializeField] private GameObject verticalRect;
     [SerializeField] private GameObject horizontalRect;
-    
-    [Range(1,1000)]
+    [SerializeField] private float startIndex;
+
+    [Range(1, 1000)]
     public int itemCount = 100;
 
     private int[,] datas;
@@ -31,7 +32,7 @@ public class TestScript : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
         }
@@ -49,12 +50,12 @@ public class TestScript : MonoBehaviour
     {
         int prefabLength = pooling.Prefabs.Length;
 
-        datas = new int[prefabLength,itemCount];
-        for(int i=0;i<prefabLength;i++)
+        datas = new int[prefabLength, itemCount];
+        for (int i = 0; i < prefabLength; i++)
         {
-            for(int j=0;j<itemCount;j++)
+            for (int j = 0; j < itemCount; j++)
             {
-                datas[i,j] = UnityEngine.Random.Range(0,100);
+                datas[i, j] = UnityEngine.Random.Range(0, 100);
             }
         }
     }
@@ -90,7 +91,7 @@ public class TestScript : MonoBehaviour
 
     private void UpdateItem(int dataIndex, int objectIndex)
     {
-        itemObjects[curCategoryIndex][objectIndex].SetView(dataIndex+1, datas[curCategoryIndex,dataIndex]);
+        itemObjects[curCategoryIndex][objectIndex].SetView(dataIndex + 1, datas[curCategoryIndex, dataIndex]);
     }
 
     public void SelectCategory(int index)
@@ -108,6 +109,10 @@ public class TestScript : MonoBehaviour
             GetScrollViewObject(curCategoryIndex);
         }
 
+        // If you need set first position
+
+        pooling.scrollRect.content.anchoredPosition = pooling.GetTargetItemPos(EScrollType.Vertical, startIndex);
         pooling.InitView();
+        pooling.StopScollViewMoving();
     }
 }
