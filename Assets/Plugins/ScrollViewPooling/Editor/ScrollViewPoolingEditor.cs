@@ -18,7 +18,10 @@ namespace Wise.ScrollViewPooling
         private SerializedProperty _isReverse;
 
         private SerializedProperty _poolingCount;
-        private SerializedProperty _gridSize;
+        private SerializedProperty _gridXSize;
+        private SerializedProperty _gridYSize;
+        private SerializedProperty _itemHeight;
+        private SerializedProperty _itemWidth;
         private SerializedProperty _topPadding;
         private SerializedProperty _bottomPadding;
         private SerializedProperty _itemSpace;
@@ -67,7 +70,10 @@ namespace Wise.ScrollViewPooling
             _isReverse = _object.FindProperty("isReverse");
             _prefabs = _object.FindProperty("Prefabs");
             _poolingCount = _object.FindProperty("PoolingCount");
-            _gridSize = _object.FindProperty("GridSize");
+            _gridXSize = _object.FindProperty("GridXSize");
+            _gridYSize = _object.FindProperty("GridYSize");
+            _itemWidth = _object.FindProperty("itemWidth");
+            _itemHeight = _object.FindProperty("itemHeight");
             _topPadding = _object.FindProperty("TopPadding");
             _bottomPadding = _object.FindProperty("BottomPadding");
             _itemSpace = _object.FindProperty("ItemSpace");
@@ -95,9 +101,12 @@ namespace Wise.ScrollViewPooling
                     EditorGUILayout.PropertyField(_isReverse);
                     EditorGUILayout.PropertyField(_prefabs);
                     EditorGUILayout.PropertyField(_poolingCount);
-                    EditorGUILayout.PropertyField(_gridSize);
+                    EditorGUILayout.PropertyField(_gridXSize);
+                    EditorGUILayout.PropertyField(_itemHeight);
                     EditorGUILayout.PropertyField(_topPadding);
                     EditorGUILayout.PropertyField(_bottomPadding);
+                    EditorGUILayout.PropertyField(_leftPadding);
+                    EditorGUILayout.PropertyField(_rightPadding);
                     EditorGUILayout.PropertyField(_itemSpace);
                     EditorGUILayout.PropertyField(_isPullTop);
                     EditorGUILayout.PropertyField(_isPullBottom);
@@ -108,7 +117,10 @@ namespace Wise.ScrollViewPooling
                     EditorGUILayout.PropertyField(_isReverse);
                     EditorGUILayout.PropertyField(_prefabs);
                     EditorGUILayout.PropertyField(_poolingCount);
-                    EditorGUILayout.PropertyField(_gridSize);
+                    EditorGUILayout.PropertyField(_gridYSize);
+                    EditorGUILayout.PropertyField(_itemWidth);
+                    EditorGUILayout.PropertyField(_topPadding);
+                    EditorGUILayout.PropertyField(_bottomPadding);
                     EditorGUILayout.PropertyField(_leftPadding);
                     EditorGUILayout.PropertyField(_rightPadding);
                     EditorGUILayout.PropertyField(_itemSpace);

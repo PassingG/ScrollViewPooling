@@ -23,22 +23,23 @@ namespace Wise.ScrollViewPooling
         [Header("UpdateIcon Prefab"), Space(10)]
         public GameObject updateIconPrefab;
 
-        // Vertical Option
         [Header("How many item will pooling"), Space(10)]
         public int PoolingCount = 3;
 
-        [Header("Grid Size"), Space(10)]
-        public Vector2 GridSize = Vector2.zero;
+        [Header("Size"), Space(10)]
+        public int GridXSize = 1;
+        public int GridYSize = 1;
 
+        public float itemHeight = 100f;
+        public float itemWidth = 100f;
+
+        // Vertical Option
         [Header("Paddings"), Space(10)]
         public int TopPadding = 10;
         public int BottomPadding = 10;
-
-        // Horizontal Option
-        [Header("Paddings"), Space(10)]
         public int LeftPadding = 10;
         public int RightPadding = 10;
-        public int ItemSpace = 2;
+        public Vector2 ItemSpace = Vector2.zero;
 
         [Header("Pulling Available"), Space(10)]
         public bool IsPullTop = true;
@@ -65,19 +66,18 @@ namespace Wise.ScrollViewPooling
         [HideInInspector] public ScrollRect scrollRect { get; private set; }
 
         private RectTransform content;
-        private Rect container;
+        private Rect viewPort;
 
         private RectTransform[] itemRectCache;
         private List<List<GameObject>> itemObjectCache;
         public GameObject[] GetGameObjects(int prefabIndex) => itemObjectCache[prefabIndex].ToArray();
 
-        public Dictionary<int, float> itemPositionCache { get; private set; }
+        public Dictionary<int, Vector2> itemPositionCache { get; private set; }
 
         private int curPrefabIndex = 0;
 
         private int itemCountCache;
-        private float itemHeightCache;
-        private float itemWidthCache;
+        private Vector2 itemSizeCache = Vector2.zero;
 
         private DateTime lastMoveTime;
         private int previousScrollIndex;
@@ -107,10 +107,11 @@ namespace Wise.ScrollViewPooling
 
         private void Awake()
         {
-            container = GetComponent<RectTransform>().rect;
             scrollRect = GetComponent<ScrollRect>();
+            viewPort = scrollRect.viewport.rect;
             content = scrollRect.content;
-            itemPositionCache = new Dictionary<int, float>();
+
+            itemPositionCache = new Dictionary<int, Vector2>();
 
             itemObjectCache = new List<List<GameObject>>();
             for (int i = 0; i < Prefabs.Length; i++)
@@ -129,6 +130,17 @@ namespace Wise.ScrollViewPooling
             }
             this.curPrefabIndex = curPrefabIndex;
             itemCountCache = itemCount;
+
+            for (int i = 0; i < itemObjectCache[curPrefabIndex].Count; i++)
+            {
+                if (i + 1 > itemCountCache)
+                {
+                    continue;
+                }
+
+                itemRectCache[i].anchoredPosition = itemPositionCache[i];
+                itemRectCache[i].sizeDelta = itemSizeCache;
+            }
 
             switch (ScrollType)
             {
@@ -153,20 +165,20 @@ namespace Wise.ScrollViewPooling
             {
                 case EScrollType.Vertical:
                     {
-                        float topPos = content.anchoredPosition.y - ItemSpace;
-                        float perItemSize = itemHeightCache + ItemSpace;
-                        float calculateCurPos = topPos - (perItemSize * (float)(PoolingCount - 1));
+                        float topPos = content.anchoredPosition.y - ItemSpace.y;
+                        float perItemHeght = itemSizeCache.y + ItemSpace.y;
+                        float calculateCurPos = topPos - (perItemHeght * (float)(PoolingCount - 1));
                         calculateCurPos = Mathf.Max(calculateCurPos, 0f);
-                        result = (int)(calculateCurPos / perItemSize);
+                        result = (int)(calculateCurPos / perItemHeght) * GridXSize;
                     }
                     break;
                 case EScrollType.Horizontal:
                     {
                         float leftPos = -content.anchoredPosition.x - LeftPadding;
-                        float perItemSize = itemWidthCache + ItemSpace;
-                        float calculateCurPos = leftPos - (perItemSize * (float)(PoolingCount - 1));
+                        float perItemWidth = itemSizeCache.x + ItemSpace.x;
+                        float calculateCurPos = leftPos - (perItemWidth * (float)(PoolingCount - 1));
                         calculateCurPos = Mathf.Max(calculateCurPos, 0f);
-                        result = (int)(calculateCurPos / perItemSize);
+                        result = (int)(calculateCurPos / perItemWidth) * GridYSize;
                     }
                     break;
             }
@@ -185,14 +197,14 @@ namespace Wise.ScrollViewPooling
                 case EScrollType.Vertical:
                     {
                         float index = isReverse ? itemIndex : (itemCountCache - itemIndex);
-                        calculate = -(TopPadding + (itemHeightCache + ItemSpace) * index);
+                        calculate = -(TopPadding + (itemSizeCache.y + ItemSpace.y) * (index / GridXSize));
                         result = new Vector2(contentRectTrfTmp.anchoredPosition.x, Mathf.Clamp(contentRectTrfTmp.rect.height + calculate, 0f, contentRectTrfTmp.rect.height));
                     }
                     break;
                 case EScrollType.Horizontal:
                     {
                         float index = isReverse ? (itemCountCache - itemIndex) : itemIndex;
-                        calculate = LeftPadding + (itemWidthCache + ItemSpace) * index;
+                        calculate = LeftPadding + (itemSizeCache.x + ItemSpace.x) * (index / GridYSize);
                         result = new Vector2(Mathf.Clamp(-calculate, -contentRectTrfTmp.rect.width, 0f), contentRectTrfTmp.anchoredPosition.y);
                     }
                     break;
@@ -207,86 +219,35 @@ namespace Wise.ScrollViewPooling
 
             int itemLength = itemObjectCache[curPrefabIndex].Count;
 
-            switch (ScrollType)
+            int curIndex = GetCurrentIndex(ScrollType);
+
+            for (int i = 0; i < itemLength; i++)
             {
-                case EScrollType.Vertical:
+                showed = i < itemCountCache;
+                itemObjectCache[curPrefabIndex][i].SetActive(showed);
+                if (i + 1 > itemCountCache)
+                {
+                    continue;
+                }
+
+                int calculateIndex = curIndex + i;
+
+                int newIndex = calculateIndex % itemLength;
+
+                if (calculateIndex < itemCountCache && calculateIndex >= 0)
+                {
+                    itemRectCache[newIndex].anchoredPosition = itemPositionCache[calculateIndex];
+                    itemRectCache[newIndex].sizeDelta = itemSizeCache;
+
+                    if (isReverse)
                     {
-                        int curIndex = GetCurrentIndex(ScrollType);
-
-                        for (int i = 0; i < itemLength; i++)
-                        {
-                            showed = i < itemCountCache;
-                            itemObjectCache[curPrefabIndex][i].SetActive(showed);
-                            if (i + 1 > itemCountCache)
-                            {
-                                continue;
-                            }
-
-                            int calculateIndex = curIndex + i;
-
-                            int newIndex = calculateIndex % itemLength;
-
-                            if (calculateIndex < itemCountCache && calculateIndex >= 0)
-                            {
-                                Vector2 pos = itemRectCache[newIndex].anchoredPosition;
-                                pos.y = itemPositionCache[calculateIndex];
-                                itemRectCache[newIndex].anchoredPosition = pos;
-
-                                Vector2 size = itemRectCache[newIndex].sizeDelta;
-                                size.y = itemHeightCache;
-                                itemRectCache[newIndex].sizeDelta = size;
-
-                                if (isReverse)
-                                {
-                                    OnUpdateItem(itemCountCache - calculateIndex - 1, newIndex);
-                                }
-                                else
-                                {
-                                    OnUpdateItem(calculateIndex, newIndex);
-                                }
-                            }
-                        }
+                        OnUpdateItem(itemCountCache - calculateIndex - 1, newIndex);
                     }
-                    break;
-                case EScrollType.Horizontal:
+                    else
                     {
-                        int curIndex = GetCurrentIndex(ScrollType);
-
-                        for (int i = 0; i < itemLength; i++)
-                        {
-                            showed = i < itemCountCache;
-                            itemObjectCache[curPrefabIndex][i].SetActive(showed);
-                            if (i + 1 > itemCountCache)
-                            {
-                                continue;
-                            }
-
-                            int calculateIndex = curIndex + i;
-
-                            int newIndex = calculateIndex % itemLength;
-
-                            if (calculateIndex < itemCountCache && calculateIndex >= 0)
-                            {
-                                Vector2 pos = itemRectCache[newIndex].anchoredPosition;
-                                pos.x = itemPositionCache[calculateIndex];
-                                itemRectCache[newIndex].anchoredPosition = pos;
-
-                                Vector2 size = itemRectCache[newIndex].sizeDelta;
-                                size.x = itemWidthCache;
-                                itemRectCache[newIndex].sizeDelta = size;
-
-                                if (isReverse)
-                                {
-                                    OnUpdateItem(itemCountCache - calculateIndex - 1, newIndex);
-                                }
-                                else
-                                {
-                                    OnUpdateItem(calculateIndex, newIndex);
-                                }
-                            }
-                        }
+                        OnUpdateItem(calculateIndex, newIndex);
                     }
-                    break;
+                }
             }
         }
 

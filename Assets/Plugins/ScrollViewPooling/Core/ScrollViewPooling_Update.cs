@@ -11,22 +11,38 @@ namespace Wise.ScrollViewPooling
     // Update
     public partial class ScrollViewPooling
     {
+
+        private void UpdateItem(int newIndex, int index)
+        {
+            itemRectCache[newIndex].anchoredPosition = itemPositionCache[index];
+            itemRectCache[newIndex].sizeDelta = itemSizeCache;
+
+            if (isReverse)
+            {
+                OnUpdateItem(itemCountCache - index - 1, newIndex);
+            }
+            else
+            {
+                OnUpdateItem(index, newIndex);
+            }
+        }
+
         partial void UpdateVertical()
         {
+            int curIndex = GetCurrentIndex(EScrollType.Vertical);
 
-            if (!itemPositionCache.ContainsKey(previousScrollIndex))
+            if (itemPositionCache.ContainsKey(curIndex).Equals(false))
             {
                 return;
             }
 
             scrollRect.velocity = new Vector2(scrollRect.velocity.x, Mathf.Clamp(scrollRect.velocity.y, -SCROLL_SPEED, SCROLL_SPEED));
 
-            int curIndex = GetCurrentIndex(EScrollType.Vertical);
-
             if (previousScrollIndex == curIndex)
             {
                 return;
             }
+
             if (curIndex > previousScrollIndex)
             {
                 if (curIndex - previousScrollIndex > 1)
@@ -46,22 +62,7 @@ namespace Wise.ScrollViewPooling
                 int index = curIndex + itemLength - 1;
                 if (index < itemCountCache && index >= 0)
                 {
-                    Vector2 pos = itemRectCache[newIndex].anchoredPosition;
-                    pos.y = itemPositionCache[index];
-                    itemRectCache[newIndex].anchoredPosition = pos;
-
-                    Vector2 size = itemRectCache[newIndex].sizeDelta;
-                    size.y = itemHeightCache;
-                    itemRectCache[newIndex].sizeDelta = size;
-
-                    if (isReverse)
-                    {
-                        OnUpdateItem(itemCountCache - index - 1, newIndex);
-                    }
-                    else
-                    {
-                        OnUpdateItem(index, newIndex);
-                    }
+                    UpdateItem(newIndex, index);
                 }
             }
             else
@@ -74,23 +75,7 @@ namespace Wise.ScrollViewPooling
                 int itemLength = itemObjectCache[curPrefabIndex].Count;
                 int newIndex = curIndex % itemLength;
 
-                Vector2 pos = itemRectCache[newIndex].anchoredPosition;
-                pos.y = itemPositionCache[curIndex];
-                itemRectCache[newIndex].anchoredPosition = pos;
-
-                Vector2 size = itemRectCache[newIndex].sizeDelta;
-                size.y = itemHeightCache;
-
-                itemRectCache[newIndex].sizeDelta = size;
-
-                if (isReverse)
-                {
-                    OnUpdateItem(itemCountCache - curIndex - 1, newIndex);
-                }
-                else
-                {
-                    OnUpdateItem(curIndex, newIndex);
-                }
+                UpdateItem(newIndex, curIndex);
             }
             previousScrollIndex = curIndex;
         }
@@ -129,22 +114,7 @@ namespace Wise.ScrollViewPooling
                 int index = curIndex + itemLength - 1;
                 if (index < itemCountCache)
                 {
-                    Vector2 pos = itemRectCache[newIndex].anchoredPosition;
-                    pos.x = itemPositionCache[index];
-                    itemRectCache[newIndex].anchoredPosition = pos;
-
-                    Vector2 size = itemRectCache[newIndex].sizeDelta;
-                    size.x = itemWidthCache;
-                    itemRectCache[newIndex].sizeDelta = size;
-
-                    if (isReverse)
-                    {
-                        OnUpdateItem(itemCountCache - index - 1, newIndex);
-                    }
-                    else
-                    {
-                        OnUpdateItem(index, newIndex);
-                    }
+                    UpdateItem(newIndex, index);
                 }
             }
             else
@@ -157,23 +127,7 @@ namespace Wise.ScrollViewPooling
                 int itemLength = itemObjectCache[curPrefabIndex].Count;
                 int newIndex = curIndex % itemLength;
 
-                Vector2 pos = itemRectCache[newIndex].anchoredPosition;
-                pos.x = itemPositionCache[curIndex];
-                itemRectCache[newIndex].anchoredPosition = pos;
-
-                Vector2 size = itemRectCache[newIndex].sizeDelta;
-                size.x = itemWidthCache;
-
-                itemRectCache[newIndex].sizeDelta = size;
-
-                if (isReverse)
-                {
-                    OnUpdateItem(itemCountCache - curIndex - 1, newIndex);
-                }
-                else
-                {
-                    OnUpdateItem(curIndex, newIndex);
-                }
+                UpdateItem(newIndex, curIndex);
             }
             previousScrollIndex = curIndex;
         }

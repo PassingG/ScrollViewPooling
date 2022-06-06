@@ -92,30 +92,16 @@ namespace Wise.ScrollViewPooling
             previousScrollIndex = 0;
 
             float contentHeight = CalculateContentSize();
+            content.pivot = new Vector2(0.5f, 1f);
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = Vector2.one;
+            content.offsetMax = Vector2.zero;
+            content.offsetMin = Vector2.zero;
             content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight);
 
             Vector2 pos = content.anchoredPosition;
             pos.y = 0f;
             content.anchoredPosition = pos;
-
-            Vector2 size = Vector2.zero;
-
-            for (int i = 0; i < itemObjectCache[curPrefabIndex].Count; i++)
-            {
-                if (i + 1 > itemCountCache)
-                {
-                    continue;
-                }
-
-                pos = itemRectCache[i].anchoredPosition;
-                pos.y = itemPositionCache[i];
-                pos.x = 0f;
-
-                itemRectCache[i].anchoredPosition = pos;
-                size = itemRectCache[i].sizeDelta;
-                size.y = itemHeightCache;
-                itemRectCache[i].sizeDelta = size;
-            }
 
             return isMakeObject;
         }
@@ -125,30 +111,16 @@ namespace Wise.ScrollViewPooling
             previousScrollIndex = 0;
 
             float contentWidth = CalculateContentSize();
+            content.pivot = new Vector2(0f, 0.5f);
+            content.anchorMin = new Vector2(1f, 0f);
+            content.anchorMax = Vector2.one;
+            content.offsetMax = Vector2.zero;
+            content.offsetMin = Vector2.zero;
             content.sizeDelta = new Vector2(contentWidth, content.sizeDelta.y);
 
             Vector2 pos = content.anchoredPosition;
             pos.x = 0f;
             content.anchoredPosition = pos;
-
-            Vector2 size = Vector2.zero;
-
-            for (int i = 0; i < itemObjectCache[curPrefabIndex].Count; i++)
-            {
-                if (i + 1 > itemCountCache)
-                {
-                    continue;
-                }
-
-                pos = itemRectCache[i].anchoredPosition;
-                pos.x = itemPositionCache[i];
-                pos.y = 0f;
-
-                itemRectCache[i].anchoredPosition = pos;
-                size = itemRectCache[i].sizeDelta;
-                size.x = itemWidthCache;
-                itemRectCache[i].sizeDelta = size;
-            }
 
             return isMakeObject;
         }
@@ -172,9 +144,10 @@ namespace Wise.ScrollViewPooling
             GameObject obejctTmp;
             RectTransform rectTmp;
 
-            itemHeightCache = Prefabs[curPrefabIndex].GetComponent<RectTransform>().rect.height;
+            itemSizeCache.x = (viewPort.width - LeftPadding - RightPadding - (ItemSpace.x * (GridXSize - 1))) / GridXSize;
+            itemSizeCache.y = itemHeight;
 
-            int fillCount = Mathf.RoundToInt(container.height / itemHeightCache) + (PoolingCount * 2);
+            int fillCount = GridXSize * (Mathf.RoundToInt(viewPort.height / itemSizeCache.y) + (PoolingCount * 2));
 
             int itemCount = itemObjectCache[curPrefabIndex].Count;
             // Init item rect
@@ -185,11 +158,12 @@ namespace Wise.ScrollViewPooling
                 obejctTmp.transform.localScale = Vector3.one;
                 obejctTmp.transform.localPosition = Vector3.zero;
                 rectTmp = obejctTmp.GetComponent<RectTransform>();
-                rectTmp.pivot = new Vector2(0.5f, 1f);
+                rectTmp.pivot = new Vector2(0f, 1f);
                 rectTmp.anchorMin = new Vector2(0f, 1f);
-                rectTmp.anchorMax = Vector2.one;
+                rectTmp.anchorMax = new Vector2(0f, 1f);
                 rectTmp.offsetMax = Vector2.zero;
                 rectTmp.offsetMin = Vector2.zero;
+                rectTmp.sizeDelta = itemSizeCache;
                 itemObjectCache[curPrefabIndex].Add(obejctTmp);
                 obejctTmp.SetActive(false);
                 isCreateItem = true;
@@ -210,9 +184,10 @@ namespace Wise.ScrollViewPooling
             GameObject obejctTmp;
             RectTransform rectTmp;
 
-            itemWidthCache = Prefabs[curPrefabIndex].GetComponent<RectTransform>().rect.width;
+            itemSizeCache.x = itemWidth;
+            itemSizeCache.y = (viewPort.height - TopPadding - BottomPadding - (ItemSpace.y * (GridYSize - 1))) / GridYSize;
 
-            int fillCount = Mathf.RoundToInt(container.width / itemWidthCache) + (PoolingCount * 2);
+            int fillCount = GridYSize * (Mathf.RoundToInt(viewPort.width / itemSizeCache.x) + (PoolingCount * 2));
 
             int itemCount = itemObjectCache[curPrefabIndex].Count;
 
@@ -224,11 +199,12 @@ namespace Wise.ScrollViewPooling
                 obejctTmp.transform.localScale = Vector3.one;
                 obejctTmp.transform.localPosition = Vector3.zero;
                 rectTmp = obejctTmp.GetComponent<RectTransform>();
-                rectTmp.pivot = new Vector2(0f, 0.5f);
-                rectTmp.anchorMin = Vector2.zero;
+                rectTmp.pivot = new Vector2(0f, 1f);
+                rectTmp.anchorMin = new Vector2(0f, 1f);
                 rectTmp.anchorMax = new Vector2(0f, 1f);
                 rectTmp.offsetMax = Vector2.zero;
                 rectTmp.offsetMin = Vector2.zero;
+                rectTmp.sizeDelta = itemSizeCache;
                 itemObjectCache[curPrefabIndex].Add(obejctTmp);
                 obejctTmp.SetActive(false);
                 isCreateItem = true;

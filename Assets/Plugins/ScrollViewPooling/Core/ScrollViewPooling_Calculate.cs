@@ -23,10 +23,17 @@ namespace Wise.ScrollViewPooling
             float result = 0f;
             for (int i = 0; i < itemCountCache; i++)
             {
-                itemPositionCache[i] = -(TopPadding + result + (i * ItemSpace));
-                result += itemHeightCache;
+                int newIndex = i % GridXSize;
+                itemPositionCache[i] =
+                new Vector2(LeftPadding + ((itemSizeCache.x + ItemSpace.x) * newIndex),
+                -(TopPadding + result));
+
+                if (newIndex == GridXSize - 1)
+                {
+                    result += itemSizeCache.y + ItemSpace.y;
+                }
             }
-            result += TopPadding + BottomPadding + (itemCountCache == 0 ? 0 : ((itemCountCache - 1) * ItemSpace));
+            result += TopPadding + BottomPadding + itemSizeCache.y;
 
             return result;
         }
@@ -37,10 +44,18 @@ namespace Wise.ScrollViewPooling
             float result = 0f;
             for (int i = 0; i < itemCountCache; i++)
             {
-                itemPositionCache[i] = LeftPadding + result + (i * ItemSpace);
-                result += itemWidthCache;
+                int newIndex = i % GridYSize;
+
+                itemPositionCache[i] =
+                new Vector2(LeftPadding + result,
+                -(TopPadding + (itemSizeCache.y + ItemSpace.y) * newIndex));
+
+                if (newIndex == GridYSize - 1)
+                {
+                    result += itemSizeCache.x + ItemSpace.x;
+                }
             }
-            result += LeftPadding + RightPadding + (itemCountCache == 0 ? 0 : ((itemCountCache - 1) * ItemSpace));
+            result += LeftPadding + RightPadding + itemSizeCache.x;
             return result;
         }
     }
