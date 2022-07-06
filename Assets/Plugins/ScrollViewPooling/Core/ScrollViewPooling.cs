@@ -131,6 +131,18 @@ namespace Wise.ScrollViewPooling
             this.curPrefabIndex = curPrefabIndex;
             itemCountCache = itemCount;
 
+
+            bool isCreateItems = false;
+            switch (ScrollType)
+            {
+                case EScrollType.Vertical:
+                    isCreateItems = InitVertical();
+                    break;
+                case EScrollType.Horizontal:
+                    isCreateItems = InitHorizontal();
+                    break;
+            }
+
             for (int i = 0; i < itemObjectCache[curPrefabIndex].Count; i++)
             {
                 if (i + 1 > itemCountCache)
@@ -142,14 +154,7 @@ namespace Wise.ScrollViewPooling
                 itemRectCache[i].sizeDelta = itemSizeCache;
             }
 
-            switch (ScrollType)
-            {
-                case EScrollType.Vertical:
-                    return InitVertical();
-                case EScrollType.Horizontal:
-                    return InitHorizontal();
-            }
-            return false;
+            return isCreateItems;
         }
 
         public void StopScollViewMoving()

@@ -21,6 +21,7 @@ namespace Wise.ScrollViewPooling
             itemPositionCache.Clear();
 
             float result = 0f;
+
             for (int i = 0; i < itemCountCache; i++)
             {
                 int newIndex = i % GridXSize;

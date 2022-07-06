@@ -89,15 +89,16 @@ namespace Wise.ScrollViewPooling
         private bool InitVertical()
         {
             bool isMakeObject = CreateItems();
+
+            float size = CalculateContentSize();
             previousScrollIndex = 0;
 
-            float contentHeight = CalculateContentSize();
             content.pivot = new Vector2(0.5f, 1f);
             content.anchorMin = new Vector2(0f, 1f);
             content.anchorMax = Vector2.one;
             content.offsetMax = Vector2.zero;
             content.offsetMin = Vector2.zero;
-            content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight);
+            content.sizeDelta = new Vector2(content.sizeDelta.x, size);
 
             Vector2 pos = content.anchoredPosition;
             pos.y = 0f;
@@ -108,15 +109,17 @@ namespace Wise.ScrollViewPooling
         private bool InitHorizontal()
         {
             bool isMakeObject = CreateItems();
+
+            float size = CalculateContentSize();
+
             previousScrollIndex = 0;
 
-            float contentWidth = CalculateContentSize();
             content.pivot = new Vector2(0f, 0.5f);
-            content.anchorMin = new Vector2(1f, 0f);
-            content.anchorMax = Vector2.one;
+            content.anchorMin = Vector2.zero;
+            content.anchorMax = new Vector2(0f, 1f);
             content.offsetMax = Vector2.zero;
             content.offsetMin = Vector2.zero;
-            content.sizeDelta = new Vector2(contentWidth, content.sizeDelta.y);
+            content.sizeDelta = new Vector2(size, content.sizeDelta.y);
 
             Vector2 pos = content.anchoredPosition;
             pos.x = 0f;
