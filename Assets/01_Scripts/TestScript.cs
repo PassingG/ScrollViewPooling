@@ -24,7 +24,7 @@ public class TestScript : MonoBehaviour
     public int itemCount = 100;
 
     private int[,] datas;
-    private Item[][] itemObjects;
+    public Item[][] itemObjects;
 
     private int curCategoryIndex;
 
@@ -71,22 +71,10 @@ public class TestScript : MonoBehaviour
         {
             pooling.Initialize(itemCount, i);
 
-            GetScrollViewObject(i);
+            pooling.GetScrollViewObject(itemObjects, i);
         }
 
         pooling.OnUpdateItem += UpdateItem;
-    }
-
-    private void GetScrollViewObject(int i)
-    {
-        GameObject[] objectTmp = pooling.GetGameObjects(i);
-        int objectLength = objectTmp.Length;
-
-        itemObjects[i] = new Item[objectLength];
-        for (int j = 0; j < objectLength; j++)
-        {
-            itemObjects[i][j] = objectTmp[j].GetComponent<Item>();
-        }
     }
 
     private void UpdateItem(int dataIndex, int objectIndex)
@@ -106,7 +94,7 @@ public class TestScript : MonoBehaviour
             GameObject[] objectTmp = pooling.GetGameObjects(0);
             int objectLength = objectTmp.Length;
 
-            GetScrollViewObject(curCategoryIndex);
+            pooling.GetScrollViewObject(itemObjects, curCategoryIndex);
         }
 
         // If you need set first position

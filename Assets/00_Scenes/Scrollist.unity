@@ -1295,7 +1295,7 @@ MonoBehaviour:
   m_Content: {fileID: 962703010}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
@@ -1367,9 +1367,9 @@ MonoBehaviour:
   - {fileID: 8989511748477962818, guid: 2064bfd09a7ee9f42ac77a716c0377f3, type: 3}
   updateIconPrefab: {fileID: 0}
   PoolingCount: 3
-  GridXSize: 3
+  GridXSize: 2
   GridYSize: 1
-  itemHeight: 100
+  itemHeight: 300
   itemWidth: 100
   TopPadding: 30
   BottomPadding: 10

@@ -122,6 +122,18 @@ namespace Wise.ScrollViewPooling
             // CreateIcons();
         }
 
+        public void GetScrollViewObject<T>(T[][] targetArr, int i) where T : class
+        {
+            var pooledObject = this.GetGameObjects(i);
+            var objectLength = pooledObject.Length;
+
+            targetArr[i] = new T[objectLength];
+            for (int j = 0; j < objectLength; j++)
+            {
+                targetArr[i][j] = pooledObject[j].GetComponent<T>();
+            }
+        }
+
         public bool Initialize(int itemCount, int curPrefabIndex)
         {
             for (int i = 0; i < itemObjectCache?[this.curPrefabIndex]?.Count; i++)
