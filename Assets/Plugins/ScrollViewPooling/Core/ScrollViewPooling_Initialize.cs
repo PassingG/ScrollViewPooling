@@ -147,10 +147,10 @@ namespace Wise.ScrollViewPooling
             GameObject obejctTmp;
             RectTransform rectTmp;
 
-            itemSizeCache.x = (viewPort.width - LeftPadding - RightPadding - (ItemSpace.x * (GridXSize - 1))) / GridXSize;
+            itemSizeCache.x = (viewport.rect.width - LeftPadding - RightPadding - (ItemSpace.x * (GridXSize - 1))) / GridXSize;
             itemSizeCache.y = itemHeight;
 
-            int fillCount = GridXSize * (Mathf.RoundToInt(viewPort.height / itemSizeCache.y) + (PoolingCount * 2));
+            int fillCount = GridXSize * (Mathf.RoundToInt(viewport.rect.height / itemSizeCache.y) + (PoolingCount * 2));
 
             int itemCount = itemObjectCache[curPrefabIndex].Count;
             // Init item rect
@@ -188,9 +188,9 @@ namespace Wise.ScrollViewPooling
             RectTransform rectTmp;
 
             itemSizeCache.x = itemWidth;
-            itemSizeCache.y = (viewPort.height - TopPadding - BottomPadding - (ItemSpace.y * (GridYSize - 1))) / GridYSize;
+            itemSizeCache.y = (viewport.rect.height - TopPadding - BottomPadding - (ItemSpace.y * (GridYSize - 1))) / GridYSize;
 
-            int fillCount = GridYSize * (Mathf.RoundToInt(viewPort.width / itemSizeCache.x) + (PoolingCount * 2));
+            int fillCount = GridYSize * (Mathf.RoundToInt(viewport.rect.width / itemSizeCache.x) + (PoolingCount * 2));
 
             int itemCount = itemObjectCache[curPrefabIndex].Count;
 

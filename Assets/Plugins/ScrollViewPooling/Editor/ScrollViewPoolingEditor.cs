@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -46,6 +47,33 @@ namespace Wise.ScrollViewPooling
 
         private SerializedProperty _updateIconOffest;
 
+        [MenuItem("GameObject/UI/ScrollViewPooling")]
+        private static void Create()
+        {
+            GameObject thisObject = PrefabUtility.InstantiatePrefab(Resources.Load("ScrollViewPooling")) as GameObject;
+            PrefabUtility.UnpackPrefabInstance(thisObject, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+
+            Place(thisObject);
+        }
+
+        private static void Place(GameObject gameObject)
+        {
+            gameObject.transform.parent = Selection.activeGameObject.transform;
+
+            SceneView lastView = SceneView.lastActiveSceneView;
+            gameObject.transform.position = lastView ? lastView.pivot : Vector3.zero;
+            gameObject.transform.localScale = Vector3.one;
+            gameObject.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
+
+            StageUtility.PlaceGameObjectInCurrentStage(gameObject);
+            GameObjectUtility.EnsureUniqueNameForSibling(gameObject);
+
+            Undo.RegisterCreatedObjectUndo(gameObject, $"Create Object: {gameObject.name}");
+            Selection.activeGameObject = gameObject;
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
+
         /// <summary>
         /// Init data
         /// </summary>
@@ -86,6 +114,8 @@ namespace Wise.ScrollViewPooling
             _isPullRight = _object.FindProperty("IsPullRight");
             _pullOffset = _object.FindProperty("PullOffset");
             _updateIconOffest = _object.FindProperty("UpdateIconOffest");
+            _startPullIcon = _object.FindProperty("StartPullIcon");
+            _endPullIcon = _object.FindProperty("EndPullIcon");
         }
 
         /// <summary>
@@ -93,9 +123,15 @@ namespace Wise.ScrollViewPooling
         /// </summary>
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
+
+            EditorGUILayout.Space(20f);
+            EditorGUILayout.LabelField("[ Pooling ]");
+
             _object.Update();
             EditorGUI.BeginChangeCheck();
             _target.ScrollType = (EScrollType)GUILayout.Toolbar((int)_target.ScrollType, new string[] { "Vertical", "Horizontal" });
+
             switch (_target.ScrollType)
             {
                 case EScrollType.Vertical:
@@ -113,6 +149,8 @@ namespace Wise.ScrollViewPooling
                     EditorGUILayout.PropertyField(_isPullBottom);
                     EditorGUILayout.PropertyField(_pullOffset);
                     EditorGUILayout.PropertyField(_updateIconOffest);
+                    EditorGUILayout.PropertyField(_startPullIcon);
+                    EditorGUILayout.PropertyField(_endPullIcon);
                     break;
                 case EScrollType.Horizontal:
                     EditorGUILayout.PropertyField(_isReverse);
@@ -129,6 +167,8 @@ namespace Wise.ScrollViewPooling
                     EditorGUILayout.PropertyField(_isPullRight);
                     EditorGUILayout.PropertyField(_pullOffset);
                     EditorGUILayout.PropertyField(_updateIconOffest);
+                    EditorGUILayout.PropertyField(_startPullIcon);
+                    EditorGUILayout.PropertyField(_endPullIcon);
                     break;
                 default:
                     break;

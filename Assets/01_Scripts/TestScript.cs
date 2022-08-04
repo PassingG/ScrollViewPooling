@@ -16,8 +16,6 @@ public class TestScript : MonoBehaviour
 
     [SerializeField] ScrollViewPooling pooling;
 
-    [SerializeField] private GameObject verticalRect;
-    [SerializeField] private GameObject horizontalRect;
     [SerializeField] private float startIndex;
 
     [Range(1, 1000)]
@@ -75,6 +73,12 @@ public class TestScript : MonoBehaviour
         }
 
         pooling.OnUpdateItem += UpdateItem;
+        pooling.OnPullItem += PullItem;
+    }
+
+    private void PullItem(EDirection direction)
+    {
+        Debug.Log($"<color=red>Pull {direction.ToString()}</color>");
     }
 
     private void UpdateItem(int dataIndex, int objectIndex)
@@ -99,7 +103,7 @@ public class TestScript : MonoBehaviour
 
         // If you need set first position
 
-        pooling.scrollRect.content.anchoredPosition = pooling.GetTargetItemPos(EScrollType.Vertical, startIndex);
+        pooling.content.anchoredPosition = pooling.GetTargetItemPos(EScrollType.Vertical, startIndex);
         pooling.InitView();
         pooling.StopScollViewMoving();
     }

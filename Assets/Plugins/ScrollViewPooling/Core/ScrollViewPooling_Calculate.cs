@@ -34,7 +34,7 @@ namespace Wise.ScrollViewPooling
                     result += itemSizeCache.y + ItemSpace.y;
                 }
             }
-            result += TopPadding + BottomPadding + itemSizeCache.y;
+            result += TopPadding + BottomPadding;
 
             return result;
         }
@@ -56,7 +56,7 @@ namespace Wise.ScrollViewPooling
                     result += itemSizeCache.x + ItemSpace.x;
                 }
             }
-            result += LeftPadding + RightPadding + itemSizeCache.x;
+            result += LeftPadding + RightPadding;
             return result;
         }
     }

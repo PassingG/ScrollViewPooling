@@ -9,64 +9,64 @@ using UnityEngine.UI;
 namespace Wise.ScrollViewPooling
 {
     // Main
-    [RequireComponent(typeof(ScrollRect))]
-    public partial class ScrollViewPooling : MonoBehaviour
+    [AddComponentMenu("UI/Scroll Rect Pooling", 36)]
+    public partial class ScrollViewPooling : ScrollRect
     {
         #region ----- [ Settings ] -----
         private const float SCROLL_SPEED = 5000f;
 
-        public bool isReverse = false;
+        [HideInInspector] public bool isReverse = false;
 
         [Space(10)]
-        public GameObject[] Prefabs;
+        [HideInInspector] public GameObject[] Prefabs;
 
         [Header("UpdateIcon Prefab"), Space(10)]
-        public GameObject updateIconPrefab;
+        [HideInInspector] public GameObject updateIconPrefab;
 
         [Header("How many item will pooling"), Space(10)]
-        public int PoolingCount = 3;
+        [HideInInspector] public int PoolingCount = 3;
 
         [Header("Size"), Space(10)]
-        public int GridXSize = 1;
-        public int GridYSize = 1;
+        [HideInInspector] public int GridXSize = 1;
+        [HideInInspector] public int GridYSize = 1;
 
-        public float itemHeight = 100f;
-        public float itemWidth = 100f;
+        [HideInInspector] public float itemHeight = 100f;
+        [HideInInspector] public float itemWidth = 100f;
 
         // Vertical Option
         [Header("Paddings"), Space(10)]
-        public int TopPadding = 10;
-        public int BottomPadding = 10;
-        public int LeftPadding = 10;
-        public int RightPadding = 10;
-        public Vector2 ItemSpace = Vector2.zero;
+        [HideInInspector] public int TopPadding = 10;
+        [HideInInspector] public int BottomPadding = 10;
+        [HideInInspector] public int LeftPadding = 10;
+        [HideInInspector] public int RightPadding = 10;
+        [HideInInspector] public Vector2 ItemSpace = Vector2.zero;
 
         [Header("Pulling Available"), Space(10)]
-        public bool IsPullTop = true;
-        public bool IsPullBottom = true;
+        [HideInInspector] public bool IsPullTop = true;
+        [HideInInspector] public bool IsPullBottom = true;
 
         [Header("Pulling Available"), Space(10)]
-        public bool IsPullLeft = true;
-        public bool IsPullRight = true;
+        [HideInInspector] public bool IsPullLeft = true;
+        [HideInInspector] public bool IsPullRight = true;
 
         [Header("Update Comment"), Space(10)]
-        public string PullingComment = "";
+        [HideInInspector] public string PullingComment = "";
 
         [Header("Offsets"), Space(10)]
-        public float PullOffset = 1.5f;
-        public float UpdateIconOffest = 85f;
+        [HideInInspector] public float PullOffset = 3f;
+        [HideInInspector] public float UpdateIconOffest = 100f;
         #endregion
 
         #region ----- [ Variable ] -----
-        [HideInInspector] private Image StartPullIcon;
-        [HideInInspector] private Image EndPullIcon;
+        [HideInInspector] public Image StartPullIcon;
+        [HideInInspector] public Image EndPullIcon;
 
-        [SerializeField] public EScrollType ScrollType;
+        [HideInInspector][SerializeField] public EScrollType ScrollType;
 
-        [HideInInspector] public ScrollRect scrollRect { get; private set; }
+        // [HideInInspector] public ScrollRect scrollRect { get; private set; }
 
-        private RectTransform content;
-        private Rect viewPort;
+        // private RectTransform content;
+        // private Rect viewPort;
 
         private RectTransform[] itemRectCache;
         private List<List<GameObject>> itemObjectCache;
@@ -100,26 +100,53 @@ namespace Wise.ScrollViewPooling
         /// <summary>
         /// Callback on list is pulled. Return which way pulled direction.
         /// </summary>
-        public Action<EDirection> OnPullItme = delegate { };
+        public Action<EDirection> OnPullItem = delegate { };
         #endregion
 
         #region ----- [ Function ] -----
 
-        private void Awake()
+        protected override void Awake()
         {
-            scrollRect = GetComponent<ScrollRect>();
-            viewPort = scrollRect.viewport.rect;
-            content = scrollRect.content;
+            base.Awake();
 
             itemPositionCache = new Dictionary<int, Vector2>();
-
             itemObjectCache = new List<List<GameObject>>();
-            for (int i = 0; i < Prefabs.Length; i++)
+            for (int i = 0; i < Prefabs?.Length; i++)
             {
                 itemObjectCache.Add(new List<GameObject>());
             }
-            // scrollRect.onValueChanged.AddListener(OnScrollChange);
-            // CreateIcons();
+
+            onValueChanged.RemoveAllListeners();
+            onValueChanged.AddListener(OnScrollChange);
+        }
+
+        public override void OnEndDrag(PointerEventData eventData)
+        {
+            base.OnEndDrag(eventData);
+
+            switch (ScrollType)
+            {
+                case EScrollType.Vertical:
+                    if (isCanLoadUp)
+                    {
+                        OnPullItem(EDirection.Top);
+                    }
+                    else if (isCanLoadDown)
+                    {
+                        OnPullItem(EDirection.Bottom);
+                    }
+                    break;
+                case EScrollType.Horizontal:
+                    if (isCanLoadLeft)
+                    {
+                        OnPullItem(EDirection.Left);
+                    }
+                    else if (isCanLoadRight)
+                    {
+                        OnPullItem(EDirection.Right);
+                    }
+                    break;
+            }
         }
 
         public void GetScrollViewObject<T>(T[][] targetArr, int i) where T : class
@@ -171,7 +198,7 @@ namespace Wise.ScrollViewPooling
 
         public void StopScollViewMoving()
         {
-            scrollRect.velocity = Vector2.zero;
+            velocity = Vector2.zero;
         }
 
         public int GetCurrentIndex(EScrollType scrollType)
@@ -206,7 +233,7 @@ namespace Wise.ScrollViewPooling
         public Vector2 GetTargetItemPos(EScrollType scrollType, float itemIndex, float offset = 4.5f)
         {
             Vector2 result = Vector2.zero;
-            var contentRectTrfTmp = scrollRect.content;
+            var contentRectTrfTmp = content;
             float calculate = 0f;
 
             switch (scrollType)

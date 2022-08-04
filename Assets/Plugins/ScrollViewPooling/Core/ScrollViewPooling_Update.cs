@@ -36,7 +36,7 @@ namespace Wise.ScrollViewPooling
                 return;
             }
 
-            scrollRect.velocity = new Vector2(scrollRect.velocity.x, Mathf.Clamp(scrollRect.velocity.y, -SCROLL_SPEED, SCROLL_SPEED));
+            velocity = new Vector2(velocity.x, Mathf.Clamp(velocity.y, -SCROLL_SPEED, SCROLL_SPEED));
 
             if (previousScrollIndex == curIndex)
             {
@@ -87,7 +87,7 @@ namespace Wise.ScrollViewPooling
                 return;
             }
 
-            scrollRect.velocity = new Vector2(Mathf.Clamp(scrollRect.velocity.x, -SCROLL_SPEED, SCROLL_SPEED), scrollRect.velocity.y);
+            velocity = new Vector2(Mathf.Clamp(velocity.x, -SCROLL_SPEED, SCROLL_SPEED), velocity.y);
 
             int curIndex = GetCurrentIndex(EScrollType.Horizontal);
 
